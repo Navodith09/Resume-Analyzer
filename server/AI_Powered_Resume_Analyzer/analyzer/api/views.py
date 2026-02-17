@@ -1,0 +1,90 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from ..services.extractors import extract_text_from_file
+from ..services.gemini_client import analyze_resume_with_gemini
+from ..services.score_engine import calculate_ats_score
+from ..models import ResumeAnalysis
+from .serializers import ResumeAnalysisSerializer
+
+class ResumeAnalyzeView(APIView):
+    def post(self, request):
+        serializer = ResumeAnalysisSerializer(data=request.data)
+        if not serializer.is_valid():
+             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            resume_file = request.FILES.get('resume')
+            job_description = serializer.validated_data.get('job_description')
+            job_title = serializer.validated_data.get('job_title', 'Unknown Role')
+
+            # Check if job_description is a URL
+            if job_description and (job_description.startswith('http://') or job_description.startswith('https://')):
+                from ..services.scraper import scrape_job_description
+                scraped_content = scrape_job_description(job_description)
+                if scraped_content:
+                    job_description = scraped_content
+                else:
+                    # Fallback or error - deciding to proceed with empty/original or fail?
+                    # Let's proceed but maybe warn? For now, we proceed as is, 
+                    # Gemini might handle the URL text itself or complain.
+                    pass 
+
+            if not resume_file:
+                 return Response({'error': 'No resume file provided'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Save file to media folder
+            from django.core.files.storage import default_storage
+            from django.core.files.base import ContentFile
+            import os
+
+            file_path = default_storage.save(os.path.join('resumes', resume_file.name), ContentFile(resume_file.read()))
+            
+            # Reset cursor for extraction
+            resume_file.seek(0)
+            
+            # 1. Extract Text
+            resume_text = extract_text_from_file(resume_file)
+            if not resume_text:
+                return Response({'error': 'Failed to extract text from resume'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 2. AI Analysis
+            # Pass both description and title. The service handles the fallback.
+            analysis = analyze_resume_with_gemini(resume_text, job_description, job_title)
+            if "error" in analysis:
+                return Response({'error': analysis['error']}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # 3. Calculate Score
+            final_score = calculate_ats_score(analysis)
+
+            # 4. Save to Database (if user is authenticated via JWT)
+            # Check for Authorization header
+            import jwt
+            from django.conf import settings
+            
+            user_id = None
+            if 'Authorization' in request.headers:
+                try:
+                    token = request.headers['Authorization'].split(' ')[1]
+                    data = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+                    user_id = data['user_id']
+                except Exception as e:
+                    # Token invalid or expired, but we still allow analysis, just don't save
+                    pass
+
+            if user_id:
+                ResumeAnalysis.objects.create(
+                    user_id=user_id,
+                    resume_file_name=resume_file.name,
+                    job_title=job_title,
+                    ats_score=final_score,
+                    analysis_data=analysis
+                )
+
+            return Response({
+                "score": final_score,
+                "analysis": analysis
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

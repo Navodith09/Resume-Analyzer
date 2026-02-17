@@ -46,14 +46,27 @@ def signin(request):
             
             user_model = User()
             user = user_model.authenticate(username, password)
-            
             if user:
-                # Custom session management or just return success
-                # Since we bypassed Django ORM, standart login(request, user) won't work easily with a dictionary user
-                # We can set session manually or return a token. For simplicity/session:
-                request.session['user_id'] = str(user['_id'])
-                request.session['username'] = user['username']
-                return JsonResponse({'message': 'Signin successful', 'user': serialize_user(user)}, status=200)
+                import jwt
+                import datetime
+                from django.conf import settings
+
+                # Generate JWT
+                payload = {
+                    'user_id': str(user['_id']),
+                    'email': user['email'],
+                    'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
+                    'iat': datetime.datetime.utcnow()
+                }
+                
+                # Use SECRET_KEY from settings
+                token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+                
+                return JsonResponse({
+                    'message': 'Signin successful', 
+                    'token': token,
+                    'user': serialize_user(user)
+                }, status=200)
             else:
                 return JsonResponse({'error': 'Invalid credentials'}, status=401)
         except Exception as e:
