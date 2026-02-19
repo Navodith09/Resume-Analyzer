@@ -53,6 +53,7 @@ def analyze_resume_with_gemini(resume_text, job_description, job_title=None):
         - improvement_suggestions: [list of actionable tips]
         - professional_summary: "4-5 line professional summary of the candidate based on the resume"
         - ats_score_explanation: "brief reasoning for the score"
+        - extracted_job_title: "The specific job title identified from the job description or inferred from the resume."
 
         Output strictly JSON.
         """

@@ -2,7 +2,7 @@ import jwt
 from django.conf import settings
 from django.http import JsonResponse
 from functools import wraps
-from analyzer.models import ResumeAnalysis
+from analyzer.mongo_models import ResumeAnalysisModel
 
 def jwt_required(f):
     @wraps(f)
@@ -31,18 +31,18 @@ def jwt_required(f):
 def get_user_history(request):
     if request.method == 'GET':
         try:
-            # Fetch history for the user from ResumeAnalysis (SQLite)
-            history = ResumeAnalysis.objects.filter(user_id=request.user_id).order_by('-created_at')
+            # Fetch history for the user from ResumeAnalysis (MongoDB)
+            history = ResumeAnalysisModel().get_analysis_history(request.user_id)
             
             data = []
             for item in history:
                 data.append({
-                    'id': item.id,
-                    'file_name': item.resume_file_name,
-                    'job_title': item.job_title,
-                    'score': item.ats_score,
-                    'created_at': item.created_at.isoformat(),
-                    'analysis': item.analysis_data
+                    'id': str(item['analysis_id']),
+                    'file_name': item['resume_file_name'],
+                    'job_title': item['job_title'],
+                    'score': item['ats_score'],
+                    'created_at': item['created_at'].isoformat(),
+                    'analysis': item['analysis_data']
                 })
             
             return JsonResponse({'history': data}, status=200)

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Calendar, Briefcase, Award, Download, Loader2, AlertCircle } from 'lucide-react';
 import { authService } from '../services/auth';
+import { generatePDF } from '../utils/pdfGenerator'; // Import utility
 
 const History = () => {
   const [historyData, setHistoryData] = useState([]);
@@ -32,6 +33,21 @@ const History = () => {
   const formatDate = (dateString) => {
       if (!dateString) return 'N/A';
       return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleDownload = (item) => {
+      if (item && item.analysis) {
+            // Reconstruct the data object expected by generatePDF
+            const data = {
+                score: item.score,
+                analysis: item.analysis,
+                job_title: item.job_title
+            };
+            generatePDF(data);
+      } else {
+          console.error("No analysis data available for download");
+          alert("Sorry, report data is missing for this item.");
+      }
   };
 
   if (isLoading) {
@@ -116,7 +132,11 @@ const History = () => {
                         </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-full transition-colors" title="Download Report">
+                        <button 
+                            onClick={() => handleDownload(item)}
+                            className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-full transition-colors" 
+                            title="Download Report"
+                        >
                             <Download className="h-4 w-4" />
                         </button>
                     </td>

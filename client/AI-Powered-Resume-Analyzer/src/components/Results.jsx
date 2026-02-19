@@ -1,4 +1,5 @@
 import { Award, CheckCircle, AlertCircle, AlertTriangle, Download } from 'lucide-react';
+import { generatePDF } from '../utils/pdfGenerator'; // Import utility
 
 const Results = ({ results, isLoading }) => {
     
@@ -13,8 +14,10 @@ const Results = ({ results, isLoading }) => {
     if (!results) return null;
 
     // Map API response to component data structure
+    // Map API response to component data structure
     const score = results.score || 0;
-    const analysis = results.analysis || {};
+    // Handle both nested 'analysis' (History) and flat structure (API response)
+    const analysis = results.analysis || results; 
     const summary = analysis.professional_summary || "No summary available.";
     const missingSkills = analysis.missing_skills || [];
     const improvements = analysis.improvement_suggestions || [];
@@ -24,6 +27,15 @@ const Results = ({ results, isLoading }) => {
         if (score >= 80) return 'text-green-600 border-green-500 bg-green-50';
         if (score >= 60) return 'text-yellow-600 border-yellow-500 bg-yellow-50';
         return 'text-red-600 border-red-500 bg-red-50';
+    };
+
+    const handleDownload = () => {
+        const dataForPdf = {
+            score: score,
+            analysis: analysis,
+            job_title: results.job_title || results.extracted_job_title
+        };
+        generatePDF(dataForPdf);
     };
 
     return (
@@ -50,7 +62,10 @@ const Results = ({ results, isLoading }) => {
                                 : "Your resume aligns with the job but needs optimization to pass ATS filters."}
                         </p>
                         
-                        <button className="mt-6 flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm">
+                        <button 
+                            onClick={handleDownload}
+                            className="mt-6 flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm"
+                        >
                             <Download size={16} />
                             Download Report (PDF)
                         </button>

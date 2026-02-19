@@ -13,7 +13,7 @@ class ResumeAnalyzerTests(TestCase):
     @patch('analyzer.api.views.analyze_resume_with_gemini')
     def test_resume_analysis_title_only(self, mock_analyze, mock_extract):
         mock_extract.return_value = "Resume Content"
-        mock_analyze.return_value = {"score": 80}
+        mock_analyze.return_value = {"score": 80, "extracted_job_title": "Python Developer"}
         
         resume_file = SimpleUploadedFile("resume.pdf", b"dummy", content_type="application/pdf")
         data = {'resume': resume_file, 'job_description': 'Full Job Description...'}
@@ -27,7 +27,7 @@ class ResumeAnalyzerTests(TestCase):
     @patch('analyzer.api.views.analyze_resume_with_gemini')
     def test_single_input_auto_detect(self, mock_analyze, mock_extract):
         mock_extract.return_value = "Resume Content"
-        mock_analyze.return_value = {"score": 80}
+        mock_analyze.return_value = {"score": 80, "extracted_job_title": "Python Developer"}
         
         resume_file = SimpleUploadedFile("resume.pdf", b"dummy", content_type="application/pdf")
         
@@ -45,6 +45,42 @@ class ResumeAnalyzerTests(TestCase):
         
         # We should test the service function directly for this logic.
         pass
+
+    @patch('analyzer.api.views.extract_text_from_file')
+    @patch('analyzer.api.views.analyze_resume_with_gemini')
+    @patch('analyzer.api.views.ResumeAnalysisModel')
+    @patch('jwt.decode')
+    def test_job_title_update_from_analysis(self, mock_jwt, MockModel, mock_analyze, mock_extract):
+        mock_extract.return_value = "Resume Content"
+        mock_analyze.return_value = {
+            "score": 85, 
+            "extracted_job_title": "Senior Python Developer"
+        }
+        mock_jwt.return_value = {'user_id': 'test_user_id'}
+        mock_model_instance = MockModel.return_value
+        
+        resume_file = SimpleUploadedFile("resume.pdf", b"dummy", content_type="application/pdf")
+        # Only provide resume, no job title/desc -> Title will be 'Unknown Role' initially
+        data = {'resume': resume_file, 'job_description': 'Some description'}
+        
+        # Set auth header
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer valid_token')
+        
+        response = self.client.post(self.url, data, format='multipart')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Verify save_analysis was called with the EXTRACTED title
+        # We only care that job_title was updated
+        self.assertTrue(mock_model_instance.save_analysis.called)
+        # call_args is (args, kwargs)
+        # We passed arguments as keyword arguments in views.py?
+        # Let's check views.py: ResumeAnalysisModel().save_analysis(user_id=..., ...)
+        # Yes, keyword arguments.
+        # So call_args.kwargs should contain it.
+        # call_args returns (args, kwargs) tuple.
+        call_kwargs = mock_model_instance.save_analysis.call_args.kwargs
+        self.assertEqual(call_kwargs['job_title'], 'Senior Python Developer')
 
 from analyzer.services.gemini_client import analyze_resume_with_gemini
 from unittest.mock import MagicMock

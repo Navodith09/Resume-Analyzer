@@ -4,7 +4,7 @@ from rest_framework import status
 from ..services.extractors import extract_text_from_file
 from ..services.gemini_client import analyze_resume_with_gemini
 from ..services.score_engine import calculate_ats_score
-from ..models import ResumeAnalysis
+from ..mongo_models import ResumeAnalysisModel
 from .serializers import ResumeAnalysisSerializer
 
 class ResumeAnalyzeView(APIView):
@@ -57,6 +57,10 @@ class ResumeAnalyzeView(APIView):
             # 3. Calculate Score
             final_score = calculate_ats_score(analysis)
 
+            # Update job_title if it was unknown and AI extracted one
+            if job_title == 'Unknown Role' and analysis.get('extracted_job_title'):
+                job_title = analysis.get('extracted_job_title')
+
             # 4. Save to Database (if user is authenticated via JWT)
             # Check for Authorization header
             import jwt
@@ -73,9 +77,10 @@ class ResumeAnalyzeView(APIView):
                     pass
 
             if user_id:
-                ResumeAnalysis.objects.create(
+
+                ResumeAnalysisModel().save_analysis(
                     user_id=user_id,
-                    resume_file_name=resume_file.name,
+                    file_name=resume_file.name,
                     job_title=job_title,
                     ats_score=final_score,
                     analysis_data=analysis

@@ -1,0 +1,53 @@
+# General
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+venv/
+ENV/
+db.sqlite3
+db.sqlite3-journal
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Node.js / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+/client/AI-Powered-Resume-Analyzer/dist/
+/client/AI-Powered-Resume-Analyzer/build/
+.eslintcache
+
+# Local Media
+media/
+static/

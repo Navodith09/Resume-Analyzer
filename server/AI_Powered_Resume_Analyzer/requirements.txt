@@ -10,3 +10,4 @@ djongo
 PyJWT
 beautifulsoup4
 requests
+dnspython
