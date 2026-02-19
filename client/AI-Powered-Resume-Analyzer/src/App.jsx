@@ -6,12 +6,14 @@ import Register from './pages/Register';
 import History from './pages/History';
 import ResetPassword from './pages/ResetPassword';
 
+import Footer from './components/Footer';
+
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-200">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-200 flex flex-col">
         <Navbar />
-        <main>
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/signin" element={<SignIn />} />
@@ -20,6 +22,7 @@ function App() {
             <Route path="/history" element={<History />} />
           </Routes>
         </main>
+        <Footer />
       </div>
     </Router>
   );

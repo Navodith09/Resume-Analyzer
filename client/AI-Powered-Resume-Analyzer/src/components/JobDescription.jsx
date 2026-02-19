@@ -97,6 +97,10 @@ const JobDescription = ({ onDescriptionChange, onAnalyze, isLoading }) => {
                     )}
                 </button>
             </div>
+            
+            <p className="text-center mt-4 text-xs text-gray-400 dark:text-gray-500 italic">
+                Analysis powered by <span className="font-bold">Gemini AI</span>. AI-generated content may be inaccurate. Please verify important information.
+            </p>
         </div>
     );
 };
