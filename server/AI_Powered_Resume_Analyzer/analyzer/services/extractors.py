@@ -2,6 +2,10 @@ import logging
 import pdfplumber
 import docx
 
+
+# Suppress noisy pdfminer warnings
+logging.getLogger("pdfminer").setLevel(logging.ERROR)
+
 logger = logging.getLogger(__name__)
 
 def extract_text_from_file(uploaded_file):

@@ -16,7 +16,8 @@ analyzer/
 ├── services/
 │   ├── extractors.py        # Text extraction (PDF/DOCX)
 │   ├── gemini_client.py     # AI analysis & Prompt engineering
-│   └── score_engine.py      # ATS Score calculation
+│   ├── score_engine.py      # ATS Score calculation
+│   └── scraper.py           # Job Description URL scraping
 ├── models.py                # Database models (ResumeAnalysis)
 └── urls.py                  # Routing
 ```
@@ -52,6 +53,12 @@ analyzer/
 ## Data Storage
 
 - **Users**: Stored in MongoDB (via `djongo` / direct `pymongo` in Auth app).
-- **Resume Reports**: Stored in SQLite (default Django DB) in the `ResumeAnalysis` table.
-    - Uses `user_id` (string) to link back to the MongoDB User.
-- **Files**: Uploaded resumes are stored in `media/resumes/` (Local Storage).
+- **Resume Reports**: Stored in MongoDB (via `ResumeAnalysisModel`).
+- **Files**: Processed in-memory. No permanent storage on disk.
+
+## Deployment
+
+- **Platform**: Render (or similar PaaS)
+- **Server**: `gunicorn`
+- **Static Files**: Served via `whitenoise`
+- **Build Script**: `build.sh` (Installs reqs, collects static files, migrates)

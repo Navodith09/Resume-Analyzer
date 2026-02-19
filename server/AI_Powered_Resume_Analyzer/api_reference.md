@@ -15,7 +15,7 @@ Analyzes an uploaded resume against a provided job description using Google Gemi
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
 | `resume` | File | Yes | The resume file to analyze. Supported formats: PDF (`.pdf`), Word (`.docx`, `.doc`). |
-| `job_description` | Text | **Required** | The input text. Can be a full Job Description OR a short Job Title. The system auto-detects based on length (< 200 chars treated as Title). |
+| `job_description` | Text | **Required** | The input text. Can be a full Job Description, a short Job Title, **or a URL to a job posting**. The system auto-detects based on input. |
 | `job_title` | Text | Optional | Specific job title (overrides auto-detection if provided). |
 
 ### Response Structure

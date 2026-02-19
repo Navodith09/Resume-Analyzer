@@ -11,3 +11,5 @@ PyJWT
 beautifulsoup4
 requests
 dnspython
+gunicorn
+whitenoise

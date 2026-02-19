@@ -33,15 +33,7 @@ class ResumeAnalyzeView(APIView):
             if not resume_file:
                  return Response({'error': 'No resume file provided'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Save file to media folder
-            from django.core.files.storage import default_storage
-            from django.core.files.base import ContentFile
-            import os
-
-            file_path = default_storage.save(os.path.join('resumes', resume_file.name), ContentFile(resume_file.read()))
-            
-            # Reset cursor for extraction
-            resume_file.seek(0)
+            # File is processed in-memory, no need to save to disk.
             
             # 1. Extract Text
             resume_text = extract_text_from_file(resume_file)
