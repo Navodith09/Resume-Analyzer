@@ -9,7 +9,7 @@ import ResetPassword from './pages/ResetPassword';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-200">
         <Navbar />
         <main>
           <Routes>

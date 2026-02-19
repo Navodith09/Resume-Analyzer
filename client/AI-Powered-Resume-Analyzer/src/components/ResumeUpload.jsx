@@ -65,10 +65,12 @@ const ResumeUpload = ({ onFileSelect }) => {
 
   return (
     <div className="max-w-3xl mx-auto mt-10 px-4">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">1. Upload Resume</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">1. Upload Resume</h2>
       <div 
         className={`relative border-2 border-dashed rounded-xl p-10 text-center transition-all duration-200 ${
-          dragActive ? "border-blue-500 bg-blue-50 scale-[1.01]" : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+          dragActive 
+            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-[1.01]" 
+            : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -86,12 +88,12 @@ const ResumeUpload = ({ onFileSelect }) => {
                 />
                 
                 <div className="space-y-4 pointer-events-none">
-                    <div className="bg-white p-4 rounded-full inline-block shadow-sm">
-                        <Upload className="h-8 w-8 text-indigo-500" />
+                    <div className="bg-white dark:bg-gray-700 p-4 rounded-full inline-block shadow-sm transition-colors">
+                        <Upload className="h-8 w-8 text-indigo-500 dark:text-indigo-400" />
                     </div>
                     <div>
-                        <p className="text-gray-700 font-medium text-lg">Drag and drop your resume here</p>
-                        <p className="text-gray-500 mt-1">or click to browse from your device</p>
+                        <p className="text-gray-700 dark:text-gray-200 font-medium text-lg">Drag and drop your resume here</p>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">or click to browse from your device</p>
                     </div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide">PDF, DOC, DOCX up to 10MB</p>
                 </div>
@@ -100,10 +102,10 @@ const ResumeUpload = ({ onFileSelect }) => {
 
         {isUploading && (
              <div className="flex flex-col items-center justify-center py-4">
-                <Loader2 className="h-10 w-10 text-indigo-500 animate-spin mb-3" />
-                <p className="text-gray-600 font-medium mb-2">Uploading...</p>
-                <div className="w-full max-w-xs bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                <Loader2 className="h-10 w-10 text-indigo-500 dark:text-indigo-400 animate-spin mb-3" />
+                <p className="text-gray-600 dark:text-gray-300 font-medium mb-2">Uploading...</p>
+                <div className="w-full max-w-xs bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div className="bg-indigo-600 dark:bg-indigo-500 h-2.5 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
                 </div>
                 <p className="text-xs text-gray-400 mt-2">{uploadProgress}%</p>
              </div>
@@ -111,18 +113,18 @@ const ResumeUpload = ({ onFileSelect }) => {
 
         {file && !isUploading && (
              <div className="flex flex-col items-center relative z-20">
-                <div className="bg-green-50 p-4 rounded-full mb-3 border border-green-100">
-                    <FileText className="h-8 w-8 text-green-600" />
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-full mb-3 border border-green-100 dark:border-green-800">
+                    <FileText className="h-8 w-8 text-green-600 dark:text-green-400" />
                 </div>
                 <div className="flex items-center gap-2 mb-1">
-                    <p className="text-gray-800 font-semibold text-lg">{file.name}</p>
+                    <p className="text-gray-800 dark:text-gray-200 font-semibold text-lg">{file.name}</p>
                     <Check className="h-5 w-5 text-green-500" />
                 </div>
-                <p className="text-sm text-gray-500 mb-4">{(file.size / 1024).toFixed(2)} KB</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{(file.size / 1024).toFixed(2)} KB</p>
                 
                 <button 
                     onClick={removeFile}
-                    className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 font-medium px-4 py-2 hover:bg-red-50 rounded-lg transition-colors"
+                    className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-900/10 dark:hover:bg-red-900/20 rounded-lg transition-all shadow-sm hover:shadow-md active:scale-95"
                 >
                     <X className="h-4 w-4" />
                     Remove file

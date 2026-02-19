@@ -70,33 +70,33 @@ const History = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Analysis History</h1>
-        <p className="mt-2 text-gray-600">View your past resume analysis scores and details.</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analysis History</h1>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">View your past resume analysis scores and details.</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
         {historyData.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-                <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+            <div className="p-12 text-center text-gray-500 dark:text-gray-400">
+                <FileText className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
                 <p>No analysis history found. Upload a resume to get started!</p>
             </div>
         ) : (
             <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700/50">
                 <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Date
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     File Name
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Job Role
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     ATS Score
                     </th>
                     <th scope="col" className="relative px-6 py-3">
@@ -104,24 +104,24 @@ const History = () => {
                     </th>
                 </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {historyData.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                        <Calendar className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
                         {formatDate(item.created_at)}
                         </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         <div className="flex items-center">
-                        <FileText className="h-4 w-4 mr-2 text-gray-400" />
+                        <FileText className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
                         {item.file_name}
                         </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center">
-                        <Briefcase className="h-4 w-4 mr-2 text-gray-400" />
+                        <Briefcase className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
                         {item.job_title}
                         </div>
                     </td>
@@ -134,7 +134,7 @@ const History = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button 
                             onClick={() => handleDownload(item)}
-                            className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-full transition-colors" 
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 p-2.5 rounded-full transition-all shadow-sm hover:shadow-md active:scale-95" 
                             title="Download Report"
                         >
                             <Download className="h-4 w-4" />
