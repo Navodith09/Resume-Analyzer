@@ -1,18 +1,24 @@
 import { Award, CheckCircle, AlertCircle, AlertTriangle, Download } from 'lucide-react';
 
-const Results = () => {
-    // Mock Data
-    const resultData = {
-        score: 72,
-        summary: "Your resume is well-structured but lacks specific keywords found in the job description. The experience section is strong, but the summary could be more impact-driven.",
-        missingSkills: ["TypeScript", "GraphQL", "AWS", "CI/CD"],
-        improvements: [
-            "Add 'TypeScript' and 'GraphQL' to your skills section.",
-            "Quantify your achievements in the 'Experience' section (e.g., 'Reduced load time by 20%').",
-            "Include a link to your portfolio or GitHub.",
-            "Fix the formatting inconsistency in the 'Education' section."
-        ]
-    };
+const Results = ({ results, isLoading }) => {
+    
+    if (isLoading) {
+        return (
+             <div className="max-w-5xl mx-auto mt-12 mb-20 px-4 text-center">
+                <p className="text-gray-500">Generating report...</p>
+             </div>
+        )
+    }
+
+    if (!results) return null;
+
+    // Map API response to component data structure
+    const score = results.score || 0;
+    const analysis = results.analysis || {};
+    const summary = analysis.professional_summary || "No summary available.";
+    const missingSkills = analysis.missing_skills || [];
+    const improvements = analysis.improvement_suggestions || [];
+    const matchedSkills = analysis.matched_skills || [];
 
     const getScoreColor = (score) => {
         if (score >= 80) return 'text-green-600 border-green-500 bg-green-50';
@@ -29,14 +35,20 @@ const Results = () => {
                     
                     {/* Column 1: Score & Overview */}
                     <div className="p-8 flex flex-col items-center justify-center text-center">
-                        <div className={`w-32 h-32 rounded-full border-8 flex items-center justify-center mb-4 ${getScoreColor(resultData.score)}`}>
+                        <div className={`w-32 h-32 rounded-full border-8 flex items-center justify-center mb-4 ${getScoreColor(score)}`}>
                             <div className="text-center">
-                                <span className="block text-4xl font-bold">{resultData.score}</span>
+                                <span className="block text-4xl font-bold">{score}</span>
                                 <span className="text-xs uppercase font-semibold opacity-80">ATS Score</span>
                             </div>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">Good Match</h3>
-                        <p className="text-sm text-gray-500 px-4">Your resume aligns well with the job description but has room for optimization.</p>
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                            {score >= 80 ? 'Excellent Match' : score >= 60 ? 'Good Match' : 'Needs Improvement'}
+                        </h3>
+                        <p className="text-sm text-gray-500 px-4">
+                             {score >= 80 
+                                ? "Your resume runs a high chance of passing the ATS filters." 
+                                : "Your resume aligns with the job but needs optimization to pass ATS filters."}
+                        </p>
                         
                         <button className="mt-6 flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-lg transition-colors font-medium text-sm">
                             <Download size={16} />
@@ -52,7 +64,7 @@ const Results = () => {
                                 <CheckCircle size={16} className="text-indigo-500" /> Executive Summary
                             </h4>
                             <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                {resultData.summary}
+                                {summary}
                             </p>
                         </div>
 
@@ -62,11 +74,11 @@ const Results = () => {
                                 <AlertTriangle size={16} className="text-amber-500" /> Missing Keywords
                             </h4>
                             <div className="flex flex-wrap gap-2">
-                                {resultData.missingSkills.map((skill, index) => (
+                                {missingSkills.length > 0 ? missingSkills.map((skill, index) => (
                                     <span key={index} className="px-3 py-1 bg-red-50 text-red-700 text-xs font-medium rounded-full border border-red-100">
                                         {skill}
                                     </span>
-                                ))}
+                                )) : <p className="text-sm text-gray-500">No missing keywords detected!</p>}
                             </div>
                         </div>
 
@@ -76,7 +88,7 @@ const Results = () => {
                                 <AlertCircle size={16} className="text-blue-500" /> Recommended Improvements
                             </h4>
                             <ul className="space-y-2">
-                                {resultData.improvements.map((item, index) => (
+                                {improvements.map((item, index) => (
                                     <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
                                         <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0"></div>
                                         {item}

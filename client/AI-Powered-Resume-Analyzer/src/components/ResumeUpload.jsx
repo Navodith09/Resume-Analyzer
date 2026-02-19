@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Upload, FileText, X, Check, Loader2 } from 'lucide-react';
 
-const ResumeUpload = () => {
+const ResumeUpload = ({ onFileSelect }) => {
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Effect to notify parent when file changes
+  useEffect(() => {
+    if (onFileSelect) {
+        onFileSelect(file);
+    }
+  }, [file]);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -28,9 +35,9 @@ const ResumeUpload = () => {
                 setFile(selectedFile);
                 return 100;
             }
-            return prev + 10;
+            return prev + 20; // Faster simulation
         });
-    }, 100);
+    }, 50);
   };
 
   const handleDrop = (e) => {
@@ -53,6 +60,7 @@ const ResumeUpload = () => {
       e.preventDefault();
       setFile(null);
       setUploadProgress(0);
+      // Reset input value if needed, but input is hidden and re-rendered
   }
 
   return (

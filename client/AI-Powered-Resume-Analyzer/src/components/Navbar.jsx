@@ -1,21 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, User, FileText } from 'lucide-react';
+import { authService } from '../services/auth';
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check auth state from localStorage
     const authStatus = localStorage.getItem('isAuthenticated');
+    const userData = localStorage.getItem('user');
     setIsAuthenticated(authStatus === 'true');
+    if (userData) {
+        try {
+            setUser(JSON.parse(userData));
+        } catch (e) {
+            console.error("Failed to parse user data", e);
+        }
+    }
   }, []);
 
-  const handleSignOut = () => {
-    localStorage.removeItem('isAuthenticated');
-    setIsAuthenticated(false);
-    navigate('/');
+  const handleSignOut = async () => {
+    try {
+        await authService.signOut();
+    } catch (error) {
+        console.error("Sign out failed", error);
+    } finally {
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+        setUser(null);
+        navigate('/');
+        window.location.reload(); // To refresh state if needed
+    }
   };
 
   return (
@@ -40,24 +61,29 @@ const Navbar = () => {
                  
                  <div className="h-8 w-px bg-gray-200 mx-2"></div>
                  
-                 <div className="relative group cursor-pointer">
-                    <div className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors">
+                 <div className="relative cursor-pointer">
+                    <div 
+                        className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 transition-colors"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
                         <div className="h-9 w-9 bg-indigo-100 rounded-full flex items-center justify-center border border-indigo-200 text-indigo-700">
                              <User size={20} />
                         </div>
-                        <span className="font-medium hidden sm:block">John Doe</span>
+                        <span className="font-medium hidden sm:block">{user?.username || 'User'}</span>
                     </div>
                     
                      {/* Dropdown Menu */}
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 hidden group-hover:block transistion-all">
-                        <button
-                            onClick={handleSignOut}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left flex items-center gap-2"
-                        >
-                            <LogOut size={16} />
-                            Sign out
-                        </button>
-                    </div>
+                    {isDropdownOpen && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
+                            <button
+                                onClick={handleSignOut}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left flex items-center gap-2"
+                            >
+                                <LogOut size={16} />
+                                Sign out
+                            </button>
+                        </div>
+                    )}
                  </div>
                </>
              ) : (

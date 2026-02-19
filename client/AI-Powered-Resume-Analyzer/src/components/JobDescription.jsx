@@ -1,8 +1,20 @@
 import { useState } from 'react';
-import { Type, Link } from 'lucide-react';
+import { Type, Link, Loader2 } from 'lucide-react';
 
-const JobDescription = () => {
+const JobDescription = ({ onDescriptionChange, onAnalyze, isLoading }) => {
     const [activeTab, setActiveTab] = useState('text'); // 'text' or 'link'
+
+    const handleTextChange = (e) => {
+        if (onDescriptionChange) {
+            onDescriptionChange(e.target.value, false);
+        }
+    };
+
+    const handleLinkChange = (e) => {
+        if (onDescriptionChange) {
+            onDescriptionChange(e.target.value, true);
+        }
+    };
 
     return (
         <div className="max-w-3xl mx-auto mt-8 px-4">
@@ -41,6 +53,7 @@ const JobDescription = () => {
                         <textarea
                             className="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-gray-50 text-gray-800 placeholder-gray-400"
                             placeholder="Paste the job description here or simply enter the position you are applying for (e.g., 'Senior React Developer' or 'Product Manager')..."
+                            onChange={handleTextChange}
                         ></textarea>
                     ) : (
                         <div className="h-48 flex flex-col justify-center">
@@ -57,6 +70,7 @@ const JobDescription = () => {
                                     id="job-link"
                                     className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-16 sm:text-sm border-gray-300 rounded-lg py-3"
                                     placeholder="www.linkedin.com/jobs/..."
+                                    onChange={handleLinkChange}
                                 />
                             </div>
                             <p className="mt-2 text-xs text-gray-500">
@@ -68,8 +82,19 @@ const JobDescription = () => {
             </div>
             
             <div className="mt-8 flex justify-center">
-                <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg flex items-center gap-2">
-                    Analyze Resume
+                <button 
+                    onClick={onAnalyze}
+                    disabled={isLoading}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg flex items-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                >
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="animate-spin h-5 w-5" />
+                            Analyzing...
+                        </>
+                    ) : (
+                        "Analyze Resume"
+                    )}
                 </button>
             </div>
         </div>

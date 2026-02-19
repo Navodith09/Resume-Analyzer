@@ -32,7 +32,7 @@ def analyze_resume_with_gemini(resume_text, job_description, job_title=None):
             job_description = None
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
 
         if job_description:
             prompt_context = f"Job Description:\n{job_description}"

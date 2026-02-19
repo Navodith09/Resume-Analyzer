@@ -1,30 +1,29 @@
 import { useState } from 'react';
-import { User, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { User, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { authService } from '../services/auth';
 
-const Register = () => {
+const ResetPassword = () => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setIsLoading(true);
 
     try {
-      await authService.register(username, email, password);
-      // On successful registration, redirect to sign in or sign them in directly? 
-      // API doc says 201 Created with user_id, doesn't mention session cookie.
-      // Assuming user needs to sign in after registration.
-      navigate('/signin?registered=true');
+      await authService.resetPassword(username, newPassword);
+      setSuccess('Password reset successfully. You can now sign in with your new password.');
+      setUsername('');
+      setNewPassword('');
     } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Registration failed. Please try again.');
+      console.error('Reset password error:', err);
+      setError(err.message || 'Failed to reset password. Please verify your username.');
     } finally {
       setIsLoading(false);
     }
@@ -35,13 +34,10 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
+            Reset Password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign in
-            </Link>
+            Enter your username and new password
           </p>
         </div>
 
@@ -49,6 +45,13 @@ const Register = () => {
             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start">
                 <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-red-700">{error}</p>
+            </div>
+        )}
+
+        {success && (
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md flex items-start">
+                <CheckCircle className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-green-700">{success}</p>
             </div>
         )}
 
@@ -70,32 +73,17 @@ const Register = () => {
               />
             </div>
             <div className="relative">
-              <Mail className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-            <div className="relative">
               <Lock className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
               <input
-                id="password"
-                name="password"
+                id="new-password"
+                name="new-password"
                 type="password"
                 autoComplete="new-password"
                 required
                 className="appearance-none rounded-none relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 disabled={isLoading}
               />
             </div>
@@ -111,11 +99,17 @@ const Register = () => {
                   <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                   <>
-                    Start Analyzing
+                    Reset Password
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </>
               )}
             </button>
+          </div>
+          
+          <div className="text-center">
+            <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Back to Sign In
+            </Link>
           </div>
         </form>
       </div>
@@ -123,4 +117,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default ResetPassword;
