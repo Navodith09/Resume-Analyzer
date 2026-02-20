@@ -111,10 +111,22 @@ def request_password_reset_otp(request):
             otp_model = OTP()
             otp_code = otp_model.create_otp(email)
             
-            # TODO: Configure email service to send otp_code to email
-            print(f"DEBUG: OTP for {email} is {otp_code}")
+            # Configure email service to send otp_code to email
+            from django.core.mail import send_mail
+            from django.conf import settings
             
-            return JsonResponse({'message': 'OTP sent to email', 'otp': otp_code}, status=200) # Returning OTP for testing
+            subject = 'Password Reset OTP - Resume Evaluator'
+            message = f'Your OTP for password reset is: {otp_code}\n\nThis OTP is valid for 10 minutes.\nIf you did not request a password reset, please ignore this email.'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [email]
+            
+            try:
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            except Exception as e:
+                print(f"Failed to send email: {e}")
+                return JsonResponse({'error': 'Failed to send OTP email. Please try again later.'}, status=500)
+            
+            return JsonResponse({'message': 'OTP sent to email'}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Method not allowed'}, status=405)
