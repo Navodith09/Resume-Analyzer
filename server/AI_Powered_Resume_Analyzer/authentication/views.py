@@ -118,19 +118,26 @@ def request_password_reset_otp(request):
             # --- Email Dispatch via Django SMTP ---
             from django.core.mail import send_mail
             from django.conf import settings
+            import threading
             
             subject = 'Password Reset OTP - Resume Evaluator'
             message = f'Your OTP for password reset is: {otp_code}\n\nThis OTP is valid for 10 minutes.\nIf you did not request a password reset, please ignore this email.'
             from_email = settings.EMAIL_HOST_USER
             recipient_list = [email]
             
-            try:
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-            except Exception as e:
-                print(f"Failed to send email: {e}")
-                return JsonResponse({'error': 'Failed to send OTP email. Please try again later.'}, status=500)
+            # Run email sending in a background thread to prevent Gunicorn timeouts
+            # NOTE: Render's free tier blocks outbound SMTP (Port 587). This will likely fail silently
+            # in the background, but threading prevents the main web server from crashing.
+            def send_email_async():
+                try:
+                    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                except Exception as e:
+                    print(f"Failed to send email: {e}")
             
-            return JsonResponse({'message': 'OTP sent to email'}, status=200)
+            threading.Thread(target=send_email_async).start()
+            print(f"DEBUG: OTP generated and thread started. OTP is {otp_code}")
+            
+            return JsonResponse({'message': 'OTP generated. Note: Free tier hosting may restrict SMTP delivery.'}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Method not allowed'}, status=405)
