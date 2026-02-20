@@ -13,3 +13,4 @@ requests
 dnspython
 gunicorn
 whitenoise
+resend

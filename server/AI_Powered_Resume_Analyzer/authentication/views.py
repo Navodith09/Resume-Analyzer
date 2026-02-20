@@ -115,29 +115,38 @@ def request_password_reset_otp(request):
             # Generate a 6-digit numeric OTP and store it against the user's email in DB
             otp_code = otp_model.create_otp(email)
             
-            # --- Email Dispatch via Django SMTP ---
-            from django.core.mail import send_mail
-            from django.conf import settings
+            # --- Email Dispatch via Resend HTTP API ---
+            # Using Resend instead of standard SMTP avoids Render's port 587 blockages.
             import threading
+            import resend
+            from django.conf import settings
+            import os
+            
+            # Setup Resend API Key from Environment
+            resend.api_key = os.getenv('RESEND_API_KEY')
             
             subject = 'Password Reset OTP - Resume Evaluator'
             message = f'Your OTP for password reset is: {otp_code}\n\nThis OTP is valid for 10 minutes.\nIf you did not request a password reset, please ignore this email.'
-            from_email = settings.EMAIL_HOST_USER
+            # Resend requires a verified domain or 'onboarding@resend.dev' for free testing
+            from_email = os.getenv('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
             recipient_list = [email]
             
-            # Run email sending in a background thread to prevent Gunicorn timeouts
-            # NOTE: Render's free tier blocks outbound SMTP (Port 587). This will likely fail silently
-            # in the background, but threading prevents the main web server from crashing.
             def send_email_async():
                 try:
-                    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                    params = {
+                        "from": from_email,
+                        "to": recipient_list,
+                        "subject": subject,
+                        "text": message,
+                    }
+                    resend.Emails.send(params)
                 except Exception as e:
-                    print(f"Failed to send email: {e}")
+                    print(f"Failed to send email via Resend: {e}")
             
             threading.Thread(target=send_email_async).start()
-            print(f"DEBUG: OTP generated and thread started. OTP is {otp_code}")
+            print(f"DEBUG: OTP generated and Resend thread started. OTP is {otp_code}")
             
-            return JsonResponse({'message': 'OTP generated. Note: Free tier hosting may restrict SMTP delivery.'}, status=200)
+            return JsonResponse({'message': 'OTP generated and email dispatch requested via Resend.'}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Method not allowed'}, status=405)
