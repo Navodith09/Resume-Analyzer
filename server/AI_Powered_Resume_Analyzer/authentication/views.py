@@ -51,7 +51,9 @@ def signin(request):
                 import datetime
                 from django.conf import settings
 
-                # Generate JWT
+                # --- Generate JWT Token ---
+                # Creates a stateless session token that stores the user_id and email, 
+                # valid for 1 day, reducing the need for continuous DB queries.
                 payload = {
                     'user_id': str(user['_id']),
                     'email': user['email'],
@@ -77,12 +79,13 @@ def signin(request):
 def signout(request):
     if request.method == 'POST':
         try:
-            # Clear manual session
+            # --- Clear User Session ---
+            # Remove identifying data from the server-side Django session if it exists.
             if 'user_id' in request.session:
                 del request.session['user_id']
             if 'username' in request.session:
                 del request.session['username']
-            # Also call django logout just in case
+            # Also call django logout just in case to clear any built-in auth logic.
             django_logout(request)
             return JsonResponse({'message': 'Signout successful'}, status=200)
         except Exception as e:
@@ -109,9 +112,10 @@ def request_password_reset_otp(request):
 
             from .models import OTP
             otp_model = OTP()
+            # Generate a 6-digit numeric OTP and store it against the user's email in DB
             otp_code = otp_model.create_otp(email)
             
-            # Configure email service to send otp_code to email
+            # --- Email Dispatch via Django SMTP ---
             from django.core.mail import send_mail
             from django.conf import settings
             

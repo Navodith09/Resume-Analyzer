@@ -11,8 +11,8 @@ if hasattr(settings, 'GEMINI_API_KEY'):
 
 def analyze_resume_with_gemini(resume_text, job_description, job_title=None):
     """
-    Analyzes the resume text against the job description using Gemini.
-    If job_description is missing, it uses the job_title to infer requirements.
+    Analyzes the resume text against the job description using Google's Gemini API.
+    If a job description is missing, it dynamically uses the job title to infer standard requirements.
     """
     if not resume_text:
         return {"error": "No text extracted from resume"}
@@ -20,9 +20,9 @@ def analyze_resume_with_gemini(resume_text, job_description, job_title=None):
     if not job_description and not job_title:
         return {"error": "No job description or job title provided"}
 
-    # Auto-detect if job_description is actually a job title (single input scenario)
+    # Auto-detect if job_description is actually just a job title (single input scenario)
     if job_description and not job_title:
-        # Heuristic: If input is short (e.g., < 200 chars) and doesn't look like a full description, treat as title
+        # Heuristic Logic: If the input is short (e.g., < 200 chars) and lacks detail, treat it as just a title
         if len(job_description.strip()) < 200:
             job_title = job_description
             logger.info(f"Auto-detected Job Title from input: {job_title}")

@@ -14,7 +14,6 @@ const Results = ({ results, isLoading }) => {
     if (!results) return null;
 
     // Map API response to component data structure
-    // Map API response to component data structure
     const score = results.score || 0;
     // Handle both nested 'analysis' (History) and flat structure (API response)
     const analysis = results.analysis || results; 
