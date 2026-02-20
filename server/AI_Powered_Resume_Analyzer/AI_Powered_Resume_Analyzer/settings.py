@@ -44,8 +44,6 @@ DATABASES = {
     }
 }
 
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
-MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'resume_analyzer_db')
 
 
 # ... (rest of the file)
@@ -120,6 +118,25 @@ DATABASES = {
 
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'resume_analyzer_db')
+
+# Debugging: Print masked MONGO_URI to verify it's loaded correctly
+if MONGO_URI:
+    masked_uri = MONGO_URI
+    if "@" in MONGO_URI:
+        try:
+            # Mask password in mongodb+srv://user:pass@host...
+            # Split carefully to handle potentially complex connection strings
+            protocol_part, auth_part = MONGO_URI.split("://", 1)
+            if "@" in auth_part:
+                creds, host = auth_part.split("@", 1)
+                masked_uri = f"{protocol_part}://****:****@{host}"
+            else:
+                masked_uri = "Could not parse credentials from URI"
+        except Exception:
+            masked_uri = "Could not mask URI safely"
+    print(f"DEBUG: Loaded MONGO_URI: {masked_uri}")
+else:
+    print("DEBUG: MONGO_URI is not set.")
 
 
 # Password validation

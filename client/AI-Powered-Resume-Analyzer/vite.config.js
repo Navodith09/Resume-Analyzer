@@ -8,15 +8,15 @@ export default defineConfig({
   server: {
     proxy: {
         '/auth': {
-            target: 'http://127.0.0.1:8000',
+            target: 'https://resume-evaluator-i1z7.onrender.com',
             changeOrigin: true,
             secure: false,
         },
         '/api': {
-            target: 'http://127.0.0.1:8000',
+            target: 'https://resume-evaluator-i1z7.onrender.com',
             changeOrigin: true,
             secure: false,
-        }
+        },
     }
   }
 })
