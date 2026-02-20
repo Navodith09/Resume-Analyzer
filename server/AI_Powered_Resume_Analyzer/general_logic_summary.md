@@ -62,3 +62,4 @@ analyzer/
 - **Server**: `gunicorn`
 - **Static Files**: Served via `whitenoise`
 - **Build Script**: `build.sh` (Installs reqs, collects static files, migrates)
+- **Database Access**: Ensure MongoDB Atlas IP Whitelist includes `0.0.0.0/0` (or Render static IP) for connection.

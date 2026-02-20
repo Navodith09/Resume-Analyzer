@@ -32,9 +32,18 @@ export const authService = {
     }
   },
 
-  resetPassword: async (username, newPassword) => {
+  requestPasswordReset: async (email) => {
     try {
-      const response = await api.post('/auth/reset-password/', { username, new_password: newPassword });
+      const response = await api.post('/auth/request-password-reset/', { email });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to request password reset' };
+    }
+  },
+
+  verifyOtpAndResetPassword: async (email, otp, newPassword) => {
+    try {
+      const response = await api.post('/auth/verify-otp/', { email, otp, new_password: newPassword });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Password reset failed' };

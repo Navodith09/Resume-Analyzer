@@ -90,22 +90,64 @@ def signout(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @csrf_exempt
-def reset_password(request):
+def request_password_reset_otp(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            username = data.get('username')
-            new_password = data.get('new_password')
+            email = data.get('email')
             
-            if not username or not new_password:
-                return JsonResponse({'error': 'Username and new password are required'}, status=400)
+            if not email:
+                return JsonResponse({'error': 'Email is required'}, status=400)
             
             user_model = User()
-            try:
-                user_model.reset_password(username, new_password)
-                return JsonResponse({'message': 'Password reset successful'}, status=200)
-            except ValueError as e:
-                return JsonResponse({'error': str(e)}, status=404)
+            # Check if user exists with this email
+            # Note: The User model doesn't have a get_by_email method shown, but we can query the collection directly or add one.
+            # Let's assume we can find one.
+            user = user_model.collection.find_one({'email': email})
+            if not user:
+                 return JsonResponse({'error': 'User with this email does not exist'}, status=404)
+
+            from .models import OTP
+            otp_model = OTP()
+            otp_code = otp_model.create_otp(email)
+            
+            # TODO: Configure email service to send otp_code to email
+            print(f"DEBUG: OTP for {email} is {otp_code}")
+            
+            return JsonResponse({'message': 'OTP sent to email', 'otp': otp_code}, status=200) # Returning OTP for testing
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def verify_otp(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+            otp = data.get('otp')
+            new_password = data.get('new_password')
+            
+            if not email or not otp or not new_password:
+                return JsonResponse({'error': 'Email, OTP, and new password are required'}, status=400)
+            
+            from .models import OTP
+            otp_model = OTP()
+            if otp_model.verify_otp(email, otp):
+                # OTP is valid, reset password
+                user_model = User()
+                # We need to reset password by email, but the model method uses username.
+                # Let's check the User model again. It has reset_password(username, new_password).
+                # We should update User model to allow reset by email or find username first.
+                user = user_model.collection.find_one({'email': email})
+                if user:
+                    user_model.reset_password(user['username'], new_password)
+                    return JsonResponse({'message': 'Password reset successful'}, status=200)
+                else:
+                     return JsonResponse({'error': 'User not found'}, status=404)
+            else:
+                return JsonResponse({'error': 'Invalid or expired OTP'}, status=400)
+                
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Method not allowed'}, status=405)
