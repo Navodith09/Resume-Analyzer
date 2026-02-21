@@ -5,6 +5,7 @@ import SignIn from './pages/SignIn';
 import Register from './pages/Register';
 import History from './pages/History';
 import ResetPassword from './pages/ResetPassword';
+import DevMessage from './pages/DevMessage';
 
 import Footer from './components/Footer';
 
@@ -19,6 +20,7 @@ function App() {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/dev-message" element={<DevMessage />} />
             <Route path="/history" element={<History />} />
           </Routes>
         </main>

@@ -99,7 +99,7 @@ const SignIn = () => {
 
           <div className="flex items-center justify-end">
             <div className="text-sm">
-              <Link to="/reset-password" className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
+              <Link to="/dev-message" className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300">
                 Forgot your password?
               </Link>
             </div>

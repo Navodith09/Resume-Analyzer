@@ -107,31 +107,31 @@ const History = () => {
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {historyData.map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
+                        <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                         {formatDate(item.created_at)}
                         </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <td className="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900 dark:text-white max-w-[120px] sm:max-w-[200px] md:max-w-xs lg:max-w-sm">
                         <div className="flex items-center">
-                        <FileText className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
-                        {item.file_name}
+                        <FileText className="h-4 w-4 mr-2 flex-shrink-0 text-gray-400 dark:text-gray-500" />
+                        <span className="line-clamp-2 sm:truncate leading-tight" title={item.file_name}>{item.file_name}</span>
                         </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-4 sm:px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-[100px] sm:max-w-[150px] md:max-w-[250px]">
                         <div className="flex items-center">
-                        <Briefcase className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
-                        {item.job_title}
+                        <Briefcase className="h-4 w-4 mr-2 flex-shrink-0 text-gray-400 dark:text-gray-500" />
+                        <span className="line-clamp-2 sm:truncate leading-tight" title={item.job_title}>{item.job_title}</span>
                         </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreColor(item.score)}`}>
                             <Award className="h-3 w-3 mr-1" />
                             {item.score}/100
                         </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button 
                             onClick={() => handleDownload(item)}
                             className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 p-2.5 rounded-full transition-all shadow-sm hover:shadow-md active:scale-95" 
